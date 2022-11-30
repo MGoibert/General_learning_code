@@ -124,11 +124,12 @@ def main_exp(epochs):
 	        self.d = d
 	        self.R = R
 	        self.L = L
+	        self.sigmoid = nn.Sigmoid()
 
 	    def forward(self, x):
 	        x = torch.tensor(x).float()
 	        x = x.view(-1, 3, 32, 32)
-	        return self.network(x)
+	        return self.sigmoid(self.network(x))
 
 	    def __repr__(self):
 	        return "CIFAR_ResNet(d=%d, regime='fully trained')" % (self.d)
@@ -170,7 +171,6 @@ def main_exp(epochs):
 	    return acc
 
 	def fit(model, epochs, dataset, dataset_val, model_path=f"{os.getcwd()}/trained_models/"):
-	    sigmoid = nn.Sigmoid()
 	    if not os.path.exists(model_path):
 	        os.makedirs(model_path)
 	    optimizer = optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.99), weight_decay=0.01)
@@ -185,7 +185,7 @@ def main_exp(epochs):
 	            x_batch = x_batch.unsqueeze(0).float()
 	            y_batch = torch.tensor(y_batch).unsqueeze(0).float()
 	            optimizer.zero_grad()
-	            y_pred = sigmoid(model(x_batch).squeeze(0))
+	            y_pred = model(x_batch).squeeze(0)
 	            loss = loss_func(y_pred, y_batch)
 	            loss.backward()
 	            optimizer.step()
@@ -203,5 +203,5 @@ def main_exp(epochs):
 
 if __name__ == "__main__":
 	epochs = 50
-    main_exp(epochs)
+	main_exp(epochs)
 
